@@ -17,6 +17,8 @@ type Image struct {
 
 var pngEncoder = png.Encoder{CompressionLevel: -3}
 
+
+
 func (m *Image) Resize(width int, height int) *Image {
 	resize_image := imaging.Resize(*m.src, width, height, imaging.Lanczos);
 
@@ -36,7 +38,7 @@ func (m *Image) ResizeWithWidth (width int) *Image {
 	return m
 }
 
-func (m *Image) ImageToPng() ([]byte, error) {
+func (m *Image) ImageToPngByte() ([]byte, error) {
 	buf := new(bytes.Buffer);
 
 	if err := pngEncoder.Encode(buf, *m.src); err != nil {
