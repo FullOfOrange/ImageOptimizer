@@ -2,12 +2,11 @@ package optimizer
 
 import (
 	"bytes"
-	"image"
-	"image/png"
-	_ "image/jpeg"
-	_ "image/gif"
-
 	"github.com/disintegration/imaging"
+	"image"
+	_ "image/gif"
+	"image/jpeg"
+	_ "image/jpeg"
 )
 
 type Image struct {
@@ -15,11 +14,10 @@ type Image struct {
 	conf *image.Config
 }
 
-var pngEncoder = png.Encoder{CompressionLevel: -3}
-
 func resize(m *Image, width int, height int, done chan bool) {
 	*m.src = imaging.Resize(*m.src, width, height, imaging.Lanczos);
 	done <- true
+	close(done)
 }
 
 func (m *Image) Resize(width int, height int) *Image {
@@ -42,11 +40,24 @@ func (m *Image) ResizeWithWidth (width int) *Image {
 	return m
 }
 
-func (m *Image) ImageToPngByte() ([]byte, error) {
-	buf := new(bytes.Buffer);
+func encode(src *image.Image, buf *bytes.Buffer, done chan error) {
+	if err := jpeg.Encode(buf, *src, nil); err != nil {
+		done <- err
+		close(done)
+		return
+	}
+	done <- nil
+	close(done)
+}
 
-	if err := pngEncoder.Encode(buf, *m.src); err != nil {
-		return nil, err;
+func (m *Image) ImageToJPEGByte() ([]byte, error) {
+	buf := new(bytes.Buffer);
+	done := make(chan error)
+
+	go encode(m.src, buf, done)
+
+	if err :=<- done; err != nil {
+		return nil, err
 	}
 	return buf.Bytes(), nil
 }
