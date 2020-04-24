@@ -1,0 +1,15 @@
+# Artillery test file
+config:
+  target: http://localhost:8080/image?width=500
+  http:
+    timeout: 10
+  phases:
+    - duration: 10
+      arrivalRate: 100
+
+scenarios:
+  - flow:
+      - get:
+          url: "/image"
+          qs:
+            width: "500"
