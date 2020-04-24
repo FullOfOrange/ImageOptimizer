@@ -17,12 +17,16 @@ type Image struct {
 
 var pngEncoder = png.Encoder{CompressionLevel: -3}
 
-
+func resize(m *Image, width int, height int, done chan bool) {
+	*m.src = imaging.Resize(*m.src, width, height, imaging.Lanczos);
+	done <- true
+}
 
 func (m *Image) Resize(width int, height int) *Image {
-	resize_image := imaging.Resize(*m.src, width, height, imaging.Lanczos);
+	done := make(chan bool)
+	go resize(m, width, height, done);
 
-	*m.src = resize_image
+	<- done
 	return m
 }
 
