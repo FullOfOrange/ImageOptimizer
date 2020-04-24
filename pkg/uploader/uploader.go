@@ -9,7 +9,7 @@ import (
 )
 
 func GetImage(uuid string) ([]byte, error){
-	f, err := os.Open(fmt.Sprintf("%s.png", uuid))
+	f, err := os.Open(fmt.Sprintf("./images/%s.png", uuid))
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func GetImage(uuid string) ([]byte, error){
 
 func SaveImage(image []byte) (string, error) {
 	name := uuid.New().String();
-	filename := fmt.Sprintf("%s.png", name)
+	filename := fmt.Sprintf("./images/%s.png", name)
 
 	f, err := os.Create(filename)
 	if err != nil {
