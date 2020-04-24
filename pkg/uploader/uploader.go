@@ -9,7 +9,7 @@ import (
 )
 
 func GetImage(uuid string) ([]byte, error){
-	f,err := os.Open(fmt.Sprintf("%s.png", uuid))
+	f, err := os.Open(fmt.Sprintf("%s.png", uuid))
 	if err != nil {
 		return nil, err
 	}
@@ -18,8 +18,8 @@ func GetImage(uuid string) ([]byte, error){
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close();
 
+	defer f.Close();
 	return byte, nil;
 }
 
@@ -31,13 +31,11 @@ func SaveImage(image []byte) (string, error) {
 	if err != nil {
 		return name, err
 	}
-	n, err := f.Write(image)
-	if err != nil {
-		os.Remove(filename)
-		return name, err
-	}
-	if  n != len(image){
-		os.Remove(filename)
+
+	if n, err := f.Write(image); err != nil || n != len(image) {
+		if err = os.Remove(filename); err != nil {
+			return name, fmt.Errorf("writing error but can't remove")
+		}
 		return name, fmt.Errorf("writing error")
 	}
 
