@@ -1,14 +1,14 @@
 package main
 
 import (
-	"github.com/FullOfOrange/Devlog-Image/pkg/optimizer"
-	"io/ioutil"
 	"log"
-	"os"
+
+	"github.com/FullOfOrange/Devlog-Image/pkg/optimizer"
+	"github.com/FullOfOrange/Devlog-Image/pkg/uploader"
 )
 
 func main() {
-	image_file, err := ioutil.ReadFile("./image.png")
+	image_file, err := uploader.GetImage("image")
 	if err != nil {
 		log.Fatal("1we2", err)
 	}
@@ -24,6 +24,5 @@ func main() {
 		log.Fatal("ㅁㄴㅇㄹ", err)
 	}
 
-	f, err := os.Create("image2.png");
-	f.Write(byte)
+	uploader.SaveImage(byte)
 }
