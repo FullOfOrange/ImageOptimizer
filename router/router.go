@@ -1,16 +1,16 @@
 package router
 
 import (
+	"github.com/FullOfOrange/Devlog-Image/pkg/optimizer"
 	"github.com/FullOfOrange/Devlog-Image/pkg/uploader"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
 func InitRouter() *http.ServeMux{
 	mux := http.NewServeMux()
-
 	mux.HandleFunc("/", imageDownloadHandler)
-
 	return mux
 }
 
@@ -23,8 +23,7 @@ func imageDownloadHandler(w http.ResponseWriter, r *http.Request){
 	url := r.URL
 	filename := strings.TrimLeft(url.Path,"/");
 
-	//query := url.Query()
-	//width := query.Get("width")
+	query := url.Query()
 
 	imagebyte, err := uploader.GetImage(filename)
 	if err != nil {
@@ -32,9 +31,23 @@ func imageDownloadHandler(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
+	if width, err := strconv.Atoi(query.Get("width")); err == nil {
+		image, err := optimizer.ByteToImage(imagebyte);
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
+		imagebyte, err = image.ResizeWithWidth(width).ImageToPngByte()
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
+	}
+
+	w.Header().Add("Content-Type","image/png")
+	w.WriteHeader(200);
 	if n, err := w.Write(imagebyte); err != nil || n != len(imagebyte){
 		w.WriteHeader(500)
 		return
 	}
-	w.WriteHeader(200);
 }
