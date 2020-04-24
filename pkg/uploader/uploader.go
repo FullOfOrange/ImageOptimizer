@@ -13,27 +13,31 @@ func GetImage(uuid string) ([]byte, error){
 	if err != nil {
 		return nil, err
 	}
+
 	byte, err := ioutil.ReadAll(f);
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close();
+
 	return byte, nil;
 }
 
 func SaveImage(image []byte) (string, error) {
 	name := uuid.New().String();
-	f, err := os.Create(fmt.Sprintf("%s.png", name))
+	filename := fmt.Sprintf("%s.png", name)
+
+	f, err := os.Create(filename)
 	if err != nil {
 		return name, err
 	}
-	// 만약 쓰기 실패가 발생하더라도 추후 이미지 사용률에 따라 제거될 것이니
-	// 신경쓰지 않고 이미지를 지우는 로직은 작성은 일단 안해놓
 	n, err := f.Write(image)
 	if err != nil {
+		os.Remove(filename)
 		return name, err
 	}
 	if  n != len(image){
+		os.Remove(filename)
 		return name, fmt.Errorf("writing error")
 	}
 
