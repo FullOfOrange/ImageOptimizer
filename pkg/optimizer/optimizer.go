@@ -2,11 +2,12 @@ package optimizer
 
 import (
 	"bytes"
-	"github.com/disintegration/imaging"
 	"image"
 	_ "image/gif"
 	"image/jpeg"
-	_ "image/jpeg"
+	_ "image/png"
+
+	"github.com/disintegration/imaging"
 )
 
 type Image struct {
