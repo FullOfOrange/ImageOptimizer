@@ -18,6 +18,7 @@ func InitRouter() *http.ServeMux{
 }
 
 func imageHandler(w http.ResponseWriter, r *http.Request) {
+	// GET 으로 들어온 파일 다운로드 요청
 	if r.Method == http.MethodGet {
 		url := r.URL
 		filename := strings.TrimLeft(url.Path, "/");
@@ -57,8 +58,14 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(500)
 			return
 		}
+
+	// POST 로 들어온 파일 업로드 요청임
 	} else if r.Method == http.MethodPost {
 
+	// Delete 로 들어온 파일 삭제 요청임
+	// 이곳에서는 캐시와 optimizing 된 모든 파일 또한 삭제되어야함.
+	} else if r.Method == http.MethodDelete{
+		
 	} else {
 		w.WriteHeader(404)
 		return
