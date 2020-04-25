@@ -5,30 +5,22 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/FullOfOrange/ImageOptimizer/pkg/cache"
 	"github.com/google/uuid"
 )
 
 func GetImage(name string) ([]byte, error){
 	var byte []byte
-	if !cache.CheckCachedImage(name) {
-		f, err := os.Open(fmt.Sprintf("./images/%s", name))
-		if err != nil {
-			return nil, err
-		}
-
-		byte, err = ioutil.ReadAll(f);
-		if err != nil {
-			return nil, err
-		}
-
-		cache.CachingImage(name, byte)
-
-		defer f.Close();
-	} else {
-		byte = cache.GetCachedImage(name)
+	f, err := os.Open(fmt.Sprintf("./images/%s", name))
+	if err != nil {
+		return nil, err
 	}
 
+	byte, err = ioutil.ReadAll(f);
+	if err != nil {
+		return nil, err
+	}
+
+	defer f.Close();
 	return byte, nil;
 }
 
