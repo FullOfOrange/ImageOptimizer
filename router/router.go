@@ -62,6 +62,28 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 
 	// POST 로 들어온 파일 업로드 요청임
 	} else if r.Method == http.MethodPost {
+		// 10 << 20 = 10mb file size limit
+		r.ParseMultipartForm(10 << 20)
+
+		file, handler, err := r.FormFile("image")
+		if err != nil {
+			// 이곳에서 제대로 된 키로 주입시키도록 유도해야
+			w.WriteHeader(400)
+			return
+		}
+
+		byte, err := ioutil.ReadAll(file)
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
+
+		_, err = uploader.SaveImage(byte, handler.Filename)
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
+		w.WriteHeader(200)
 
 	// Delete 로 들어온 파일 삭제 요청임
 	// 이곳에서는 캐시와 optimizing 된 모든 파일 또한 삭제되어야함.
