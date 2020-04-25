@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/FullOfOrange/Devlog-Image/router"
+	"github.com/FullOfOrange/ImageOptimizer/router"
 )
 
 func main() {
