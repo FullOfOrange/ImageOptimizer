@@ -2,29 +2,40 @@ package uploader
 
 import (
 	"fmt"
-	"os"
+	"github.com/FullOfOrange/ImageOptimizer/pkg/cache"
 	"io/ioutil"
+	"os"
 
 	"github.com/google/uuid"
 )
 
 func GetImage(uuid string) ([]byte, error){
-	f, err := os.Open(fmt.Sprintf("./images/%s", uuid))
-	if err != nil {
-		return nil, err
+	var byte []byte
+	if !cache.CheckCachedImage(uuid) {
+		f, err := os.Open(fmt.Sprintf("./images/%s", uuid))
+		if err != nil {
+			return nil, err
+		}
+
+		byte, err = ioutil.ReadAll(f);
+		if err != nil {
+			return nil, err
+		}
+
+		cache.CachingImage(uuid, byte)
+
+		defer f.Close();
+	} else {
+		byte = cache.GetCachedImage(uuid)
 	}
 
-	byte, err := ioutil.ReadAll(f);
-	if err != nil {
-		return nil, err
-	}
-
-	defer f.Close();
 	return byte, nil;
 }
 
-func SaveImage(image []byte) (string, error) {
-	name := uuid.New().String();
+func SaveImage(image []byte, name string) (string, error) {
+	if name == "" {
+		name = uuid.New().String();
+	}
 	filename := fmt.Sprintf("./images/%s", name)
 
 	f, err := os.Create(filename)
