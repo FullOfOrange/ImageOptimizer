@@ -2,17 +2,17 @@ package uploader
 
 import (
 	"fmt"
-	"github.com/FullOfOrange/ImageOptimizer/pkg/cache"
 	"io/ioutil"
 	"os"
 
+	"github.com/FullOfOrange/ImageOptimizer/pkg/cache"
 	"github.com/google/uuid"
 )
 
-func GetImage(uuid string) ([]byte, error){
+func GetImage(name string) ([]byte, error){
 	var byte []byte
-	if !cache.CheckCachedImage(uuid) {
-		f, err := os.Open(fmt.Sprintf("./images/%s", uuid))
+	if !cache.CheckCachedImage(name) {
+		f, err := os.Open(fmt.Sprintf("./images/%s", name))
 		if err != nil {
 			return nil, err
 		}
@@ -22,11 +22,11 @@ func GetImage(uuid string) ([]byte, error){
 			return nil, err
 		}
 
-		cache.CachingImage(uuid, byte)
+		cache.CachingImage(name, byte)
 
 		defer f.Close();
 	} else {
-		byte = cache.GetCachedImage(uuid)
+		byte = cache.GetCachedImage(name)
 	}
 
 	return byte, nil;
