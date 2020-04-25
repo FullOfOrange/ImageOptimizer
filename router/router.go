@@ -2,12 +2,13 @@ package router
 
 import (
 	"fmt"
-	"github.com/FullOfOrange/ImageOptimizer/pkg/optimizer"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
+	"github.com/FullOfOrange/ImageOptimizer/pkg/optimizer"
 	"github.com/FullOfOrange/ImageOptimizer/pkg/uploader"
 )
 
@@ -39,11 +40,11 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 				if width != 0 && height != 0 {
-					imagebyte, err = image.Resize(width, height).ImageToJPEGByte()
+					imagebyte, err = image.Resize(width, height).ImageToPNGByte()
 				} else if width != 0 {
-					imagebyte, err = image.ResizeWithWidth(width).ImageToJPEGByte()
+					imagebyte, err = image.ResizeWithWidth(width).ImageToPNGByte()
 				} else {
-					imagebyte, err = image.ResizeWithHeight(height).ImageToJPEGByte()
+					imagebyte, err = image.ResizeWithHeight(height).ImageToPNGByte()
 				}
 				if err != nil {
 					w.WriteHeader(500)

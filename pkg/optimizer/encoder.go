@@ -3,11 +3,11 @@ package optimizer
 import (
 	"bytes"
 	"image"
-	"image/jpeg"
+	"image/png"
 )
 
 func encode(src *image.Image, buf *bytes.Buffer, done chan error) {
-	if err := jpeg.Encode(buf, *src, nil); err != nil {
+	if err := png.Encode(buf, *src); err != nil {
 		done <- err
 		close(done)
 		return
@@ -16,7 +16,7 @@ func encode(src *image.Image, buf *bytes.Buffer, done chan error) {
 	close(done)
 }
 
-func (m *Image) ImageToJPEGByte() ([]byte, error) {
+func (m *Image) ImageToPNGByte() ([]byte, error) {
 	buf := new(bytes.Buffer);
 	done := make(chan error)
 
