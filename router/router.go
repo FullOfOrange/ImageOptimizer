@@ -24,11 +24,16 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 		url := r.URL
 		filename := strings.TrimLeft(url.Path, "/");
 		width, height := getImageOptSize(url.Query())
-		str := filename +"?"+getImageOptQueryString(width, height)
+		var isOrigin = true
+		if width != 0 || height != 0 {
+			isOrigin = false
+		}
 
-		imagebyte, err := uploader.GetImage(str)
+		str := filename + getImageOptQueryString(width, height)
+
+		imagebyte, err := uploader.GetImage(str, isOrigin)
 		if err != nil {
-			imagebyte, err = uploader.GetImage(filename)
+			imagebyte, err = uploader.GetImage(filename, true)
 			if err != nil {
 				w.WriteHeader(404)
 				return
@@ -51,7 +56,7 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 			}
-			uploader.SaveImage(imagebyte, str)
+			uploader.SaveImage(imagebyte, str, false)
 		}
 		w.Header().Add("Content-Type", "image/jpeg")
 		w.WriteHeader(200);
@@ -78,7 +83,7 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = uploader.SaveImage(byte, handler.Filename)
+		_, err = uploader.SaveImage(byte, handler.Filename, true)
 		if err != nil {
 			w.WriteHeader(500)
 			return
@@ -88,10 +93,9 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	// Delete 로 들어온 파일 삭제 요청임
 	// 이곳에서는 캐시와 optimizing 된 모든 파일 또한 삭제되어야함.
 	} else if r.Method == http.MethodDelete{
-		
+
 	} else {
 		w.WriteHeader(404)
-		return
 	}
 }
 
@@ -109,6 +113,9 @@ func getImageOptSize(query url.Values) (width int, height int) {
 }
 
 func getImageOptQueryString(width int, height int) (result string){
+	if width != 0 || height != 0 {
+		result += "?"
+	}
 	if width != 0 {
 		result += fmt.Sprintf("width=%d", width)
 	}
