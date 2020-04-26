@@ -3,14 +3,29 @@ package uploader
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/google/uuid"
 )
 
-func GetImage(name string) ([]byte, error){
+var IMAGE_DIR = "./images"
+var ORIGIN = "/ori"
+var OPTIMIZED = "/opt"
+
+func getImagePath(name string, isOrigin bool) string {
+	var dir = ORIGIN
+	if !isOrigin {
+		dir = OPTIMIZED
+	}
+	return IMAGE_DIR + dir + "/" + name
+}
+
+func GetImage(name string, isOrigin bool) ([]byte, error){
 	var byte []byte
-	f, err := os.Open(fmt.Sprintf("./images/%s", name))
+	str := getImagePath(name, isOrigin)
+	log.Print(str)
+	f, err := os.Open(getImagePath(name, isOrigin))
 	if err != nil {
 		return nil, err
 	}
@@ -24,15 +39,19 @@ func GetImage(name string) ([]byte, error){
 	return byte, nil;
 }
 
-func SaveImage(image []byte, name string) (string, error) {
+func SaveImage(image []byte, name string, isOrigin bool) (string, error) {
+	var err error
+	var f *os.File
+
 	if name == "" {
 		name = uuid.New().String();
 	}
-	filename := fmt.Sprintf("./images/%s", name)
+	filename := getImagePath(name, isOrigin)
 
-	f, err := os.Create(filename)
-	if err != nil {
-		return name, err
+	if f = CheckImageExist(name, isOrigin); f == nil {
+		if f, err = os.Create(filename); err != nil {
+			return name, err
+		}
 	}
 
 	if n, err := f.Write(image); err != nil || n != len(image) {
@@ -42,6 +61,13 @@ func SaveImage(image []byte, name string) (string, error) {
 		return name, fmt.Errorf("writing error")
 	}
 
-	defer f.Close();
-	return name, nil;
+	defer f.Close()
+	return name, nil
+}
+
+func CheckImageExist(name string, isOrigin bool) *os.File {
+	if f, err := os.Open(getImagePath(name, isOrigin)); err != nil {
+		return f
+	}
+	return nil
 }
