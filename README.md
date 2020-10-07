@@ -2,9 +2,6 @@
 
 @powered by [imaging](github.com/disintegration/imaging)
 
-Devlog 포스트에서 사용할 이미지를 관하고, resize를 쉽게 하기 위해서 만든 프로젝트  
-Ncloud  ImageOptimizer + S3 storage 를 기준으로 만들었습니다.
-
 ### API
 
 > GET /{image-name}
